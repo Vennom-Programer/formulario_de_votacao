@@ -1,6 +1,24 @@
 
 const db = require('../config/database');
 
+async function listarCriterios(req, res) {
+    try {
+        const resultado = await db.query(
+            'SELECT id_criterio FROM criterios ORDER BY id_criterio'
+        );
+
+        return res.json({
+            criterios: resultado.rows.map(criterio => Number(criterio.id_criterio))
+        });
+    } catch (erro) {
+        console.error('Erro ao buscar critérios:', erro.message);
+
+        return res.status(500).json({
+            mensagem: 'Não foi possível carregar os critérios.'
+        });
+    }
+}
+
 async function criarAvaliacao(req, res) {
     const { codigo, id_projeto, notas } = req.body;
 
@@ -142,5 +160,6 @@ async function criarAvaliacao(req, res) {
 }
 
 module.exports = {
+    listarCriterios,
     criarAvaliacao
 };
