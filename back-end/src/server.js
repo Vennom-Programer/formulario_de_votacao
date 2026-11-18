@@ -2,8 +2,9 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./config/database');
-
+const statusRoutes = require('./routes/StatusRoutes');
 const avaliacaoRoutes = require('./routes/avaliacaoRoutes');
+const projetoRoutes = require('./routes/ProjetoRoutes');
 
 const app = express();
 
@@ -28,6 +29,10 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Rotas de status
+app.use('/api/status', statusRoutes);
+// Rotas de projeto
+app.use('/api/projetos', projetoRoutes);
 // Rotas de avaliação
 app.use('/api/avaliacoes', avaliacaoRoutes);
 
