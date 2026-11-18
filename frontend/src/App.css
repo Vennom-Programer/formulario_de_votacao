@@ -516,7 +516,7 @@
 	color: #fff;
 	background: var(--coral);
 	cursor: pointer;
-	font-size: 11px;
+	font-size: 18px;
 	font-weight: 600;
 	transition: background 150ms ease, transform 150ms ease;
 }
@@ -673,6 +673,7 @@
 
 	.submit-button {
 		min-height: 46px;
+		text-size-adjust: 2.5em;
 	}
 
 	.page-footer {
