@@ -29,12 +29,12 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Rotas de avaliação
+app.use('/api/avaliacoes', avaliacaoRoutes);
 // Rotas de status
 app.use('/api/status', statusRoutes);
 // Rotas de projeto
 app.use('/api/projetos', projetoRoutes);
-// Rotas de avaliação
-app.use('/api/avaliacoes', avaliacaoRoutes);
 
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
