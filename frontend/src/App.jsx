@@ -5,12 +5,14 @@ const scores = Array.from({ length: 11 }, (_, index) => index)
 
 function App() {
   const [criteria, setCriteria] = useState([])
+  const [projects, setProjects] = useState([])
   const [code, setCode] = useState('')
   const [projectId, setProjectId] = useState('')
   const [ratings, setRatings] = useState({})
   const [status, setStatus] = useState({ type: '', message: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoadingCriteria, setIsLoadingCriteria] = useState(true)
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true)
 
   const completedRatings = Object.keys(ratings).length
 
@@ -26,7 +28,15 @@ function App() {
           throw new Error(result.mensagem || 'Não foi possível carregar os critérios.')
         }
 
-        if (!Array.isArray(result.criterios) || result.criterios.length !== 6) {
+        if (
+          !Array.isArray(result.criterios) ||
+          result.criterios.length !== 6 ||
+          result.criterios.some((criterion) => (
+            !Number.isInteger(criterion.id_criterio) ||
+            typeof criterion.nome !== 'string' ||
+            !criterion.nome.trim()
+          ))
+        ) {
           throw new Error('A votação precisa ter seis critérios cadastrados.')
         }
 
@@ -44,6 +54,46 @@ function App() {
     }
 
     loadCriteria()
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    async function loadProjects() {
+      try {
+        const response = await fetch('/api/projetos')
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result.mensagem || 'Não foi possível carregar os projetos.')
+        }
+
+        if (
+          !Array.isArray(result.projetos) ||
+          result.projetos.some((project) => (
+            !Number.isInteger(Number(project.id_projeto)) ||
+            typeof project.nome !== 'string' ||
+            !project.nome.trim()
+          ))
+        ) {
+          throw new Error('A lista de projetos recebida é inválida.')
+        }
+
+        if (active) setProjects(result.projetos)
+      } catch (error) {
+        if (active) {
+          setStatus({
+            type: 'error',
+            message: error.message || 'Não foi possível carregar os projetos.',
+          })
+        }
+      } finally {
+        if (active) setIsLoadingProjects(false)
+      }
+    }
+
+    loadProjects()
     return () => { active = false }
   }, [])
 
@@ -77,9 +127,9 @@ function App() {
         body: JSON.stringify({
           codigo: code.trim(),
           id_projeto: Number(projectId),
-          notas: criteria.map((id) => ({
-            id_criterio: id,
-            valor: ratings[id],
+          notas: criteria.map((criterion) => ({
+            id_criterio: criterion.id_criterio,
+            valor: ratings[criterion.id_criterio],
           })),
         }),
       })
@@ -178,18 +228,23 @@ function App() {
                 />
               </label>
               <label className="field field-project">
-                <span>Número do projeto <span className="required-star">*</span></span>
-                <input
-                  inputMode="numeric"
-                  min="1"
+                <span>Projeto <span className="required-star">*</span></span>
+                <select
                   name="projeto"
                   onChange={(event) => setProjectId(event.target.value)}
-                  placeholder="Ex.: 12"
                   required
-                  step="1"
-                  type="number"
                   value={projectId}
-                />
+                  disabled={isLoadingProjects || projects.length === 0}
+                >
+                  <option value="">
+                    {isLoadingProjects ? 'Carregando projetos...' : 'Selecione um projeto'}
+                  </option>
+                  {projects.map((project) => (
+                    <option key={project.id_projeto} value={project.id_projeto}>
+                      {project.nome}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
 
@@ -202,19 +257,19 @@ function App() {
             </div>
 
             <div className="criteria-list">
-              {criteria.map((criterionId, index) => (
-                <fieldset className="criterion-row" key={criterionId}>
+              {criteria.map((criterion, index) => (
+                <fieldset className="criterion-row" key={criterion.id_criterio}>
                   <legend>
                     <span className="criterion-number">{String(index + 1).padStart(2, '0')}</span>
-                    <span>Critério {index + 1}</span>
+                    <span>{criterion.nome}</span>
                   </legend>
-                  <div className="rating-options" role="radiogroup" aria-label={`Nota para o critério ${index + 1}`}>
+                  <div className="rating-options" role="radiogroup" aria-label={`Nota para ${criterion.nome}`}>
                     {scores.map((score) => (
                       <label className="rating-option" key={score}>
                         <input
-                          checked={ratings[criterionId] === score}
-                          name={`criterio-${criterionId}`}
-                          onChange={() => updateRating(criterionId, score)}
+                          checked={ratings[criterion.id_criterio] === score}
+                          name={`criterio-${criterion.id_criterio}`}
+                          onChange={() => updateRating(criterion.id_criterio, score)}
                           type="radio"
                           value={score}
                         />
@@ -235,7 +290,7 @@ function App() {
 
             <div className="form-footer">
               <p>Confira suas notas antes de confirmar.<br /><span>Não é possível alterar o voto depois do envio.</span></p>
-              <button className="submit-button" disabled={isSubmitting || isLoadingCriteria || criteria.length !== 6} type="submit">
+              <button className="submit-button" disabled={isSubmitting || isLoadingCriteria || isLoadingProjects || criteria.length !== 6 || projects.length === 0} type="submit">
                 {isSubmitting ? 'Enviando...' : 'Confirmar voto'}
                 <span aria-hidden="true">↗</span>
               </button>

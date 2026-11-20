@@ -301,7 +301,9 @@
 	font-weight: 600;
 }
 
-.field input {
+.field input,
+.field select {
+	box-sizing: border-box;
 	width: 100%;
 	height: 42px;
 	padding: 0 12px;
@@ -315,11 +317,22 @@
 	transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
+.field select {
+	cursor: pointer;
+}
+
+.field select:disabled {
+	cursor: not-allowed;
+	color: #a4aca7;
+	background: #f7f8f6;
+}
+
 .field input::placeholder {
 	color: #a4aca7;
 }
 
-.field input:focus-visible {
+.field input:focus-visible,
+.field select:focus-visible {
 	border-color: #759184;
 	box-shadow: 0 0 0 3px #78968922;
 }

@@ -4,11 +4,26 @@ const db = require('../config/database');
 async function listarCriterios(req, res) {
     try {
         const resultado = await db.query(
-            'SELECT id_criterio FROM criterios ORDER BY id_criterio'
+            `SELECT c.id_criterio,
+                    to_jsonb(c) ->> (
+                        SELECT attname
+                        FROM pg_attribute
+                        WHERE attrelid = 'criterios'::regclass
+                          AND attnum > 0
+                          AND NOT attisdropped
+                        ORDER BY attnum
+                        OFFSET 1
+                        LIMIT 1
+                    ) AS nome
+             FROM criterios c
+             ORDER BY c.id_criterio`
         );
 
         return res.json({
-            criterios: resultado.rows.map(criterio => Number(criterio.id_criterio))
+            criterios: resultado.rows.map(criterio => ({
+                id_criterio: Number(criterio.id_criterio),
+                nome: criterio.nome
+            }))
         });
     } catch (erro) {
         console.error('Erro ao buscar critérios:', erro.message);
