@@ -1,7 +1,7 @@
 :root {
   font-family: 'DM Sans', sans-serif;
-  color: #23332f;
-  background: #f1f3ef;
+  color: #0D1117;
+  background: #F8FAFC;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -33,6 +33,6 @@ label {
 }
 
 ::selection {
-  color: #fff;
-  background: #d76648;
+  color: #0D1117;
+  background: #06B6D4;
 }
