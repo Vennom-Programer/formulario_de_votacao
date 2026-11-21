@@ -206,7 +206,7 @@ async function entrar(req, res) {
             );
         }
 
-        const token = criarToken(tipo, identificador);
+        const token = await criarToken(tipo, identificador);
 
         return res.json({
             mensagem: 'Login realizado com sucesso.',

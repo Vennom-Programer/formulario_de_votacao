@@ -28,6 +28,10 @@ function criarHash(valor) {
 
 // Criar e armazenar sessão
 async function criarToken(tipo, identificador) {
+    console.log('[AUTH] Iniciando criação de sessão');
+    console.log('[AUTH] Tipo:', tipo);
+    console.log('[AUTH] Identificador:', identificador);
+
     const segredo = obterSegredo();
 
     const jti = crypto.randomUUID();
@@ -49,6 +53,8 @@ async function criarToken(tipo, identificador) {
     const token = `${payload}.${assinatura}`;
 
     // Armazena somente o hash do identificador da sessão
+    console.log('[AUTH] Tentando salvar sessão no PostgreSQL');
+
     await db.query(
         `INSERT INTO sessoes (
             token_id_hash,
@@ -64,6 +70,8 @@ async function criarToken(tipo, identificador) {
             expiracao
         ]
     );
+
+    console.log('[AUTH] Sessão salva com sucesso');
 
     return token;
 }
