@@ -36,6 +36,14 @@ app.use('/api/status', statusRoutes);
 // Rotas de projeto
 app.use('/api/projetos', projetoRoutes);
 
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
-});
+// Inicialização local
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+
+    app.listen(PORT, () => {
+        console.log(`Servidor rodando na porta ${PORT}`);
+    });
+}
+
+// Exportação para a Vercel
+module.exports = app;
