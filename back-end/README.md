@@ -1,17 +1,13 @@
 ## Autenticação
 
-Configure `AUTH_SECRET` com pelo menos 32 bytes aleatórios no ambiente do backend.
-Uma opção para gerar o valor localmente é `openssl rand -hex 32`.
-Antes de iniciar o servidor, aplique a migração à tabela `usuario`:
+O backend usa as variáveis `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`,
+`DB_NAME` e `AUTH_SECRET` definidas em `back-end/.env` ou no ambiente de execução.
+O `AUTH_SECRET` precisa ter pelo menos 32 bytes. O arquivo `.env` é carregado pelo
+caminho do backend, independentemente do diretório de onde o servidor for iniciado.
 
-```sh
-node scripts/migrate-auth.js
-```
-
-A migração adiciona `id_usuario` como chave primária, libera `matricula` para
-visitantes, converte `cpf` para `VARCHAR(11)` (necessário para guardar os 11
-dígitos sem perda) e cria índices únicos para e-mail, CPF e matrícula. CPF e
-matrícula são armazenados somente no campo correspondente ao tipo de cadastro.
+A tabela `usuario` deve estar previamente configurada com `id_usuario`, `nome`,
+`email`, `senha`, `cpf` (`VARCHAR(11)`) e `matricula` (aceitando `NULL` para
+visitantes). O backend não cria nem altera tabelas.
 
 Rotas:
 
@@ -22,5 +18,6 @@ Rotas:
 - `GET /api/auth/sessao`: valida uma sessão autenticada.
 
 Senhas novas são armazenadas com scrypt e salt aleatório. Senhas legadas em texto
-plano são convertidas para hash no primeiro login bem-sucedido. A rota de envio da
-avaliação exige o token de autenticação.
+plano são convertidas para hash no primeiro login bem-sucedido. Após o login, o
+frontend guarda o token na sessão atual e libera a página de votação. A rota de
+envio da avaliação exige o token de autenticação.
