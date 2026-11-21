@@ -30,7 +30,6 @@ function criarHash(valor) {
 async function criarToken(tipo, identificador) {
     console.log('[AUTH] Iniciando criação de sessão');
     console.log('[AUTH] Tipo:', tipo);
-    console.log('[AUTH] Identificador:', identificador);
 
     const segredo = obterSegredo();
 
@@ -55,21 +54,29 @@ async function criarToken(tipo, identificador) {
     // Armazena somente o hash do identificador da sessão
     console.log('[AUTH] Tentando salvar sessão no PostgreSQL');
 
-    await db.query(
-        `INSERT INTO sessoes (
-            token_id_hash,
-            tipo,
-            identificador,
-            expira_em
-        )
-        VALUES ($1, $2, $3, to_timestamp($4))`,
-        [
-            criarHash(jti),
-            tipo,
-            String(identificador),
-            expiracao
-        ]
-    );
+    try {
+        await db.query(
+            `INSERT INTO sessoes (
+                token_id_hash,
+                tipo,
+                identificador,
+                expira_em
+            )
+            VALUES ($1, $2, $3, to_timestamp($4))`,
+            [
+                criarHash(jti),
+                tipo,
+                String(identificador),
+                expiracao
+            ]
+        );
+    } catch (erro) {
+        console.error('[AUTH] Falha ao salvar sessão no PostgreSQL:', {
+            codigo: erro.code || 'SEM_CODIGO',
+            mensagem: erro.message
+        });
+        throw erro;
+    }
 
     console.log('[AUTH] Sessão salva com sucesso');
 

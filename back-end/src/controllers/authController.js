@@ -172,12 +172,14 @@ async function entrar(req, res) {
     const { tipo, senha } = body;
     const identificadorInformado = tipo === 'visitante' ? body.cpf : body.matricula;
     const identificador = validarIdentificador(tipo, identificadorInformado);
+    let etapa = 'validar dados de acesso';
 
     if (!identificador || typeof senha !== 'string' || senha.length === 0) {
         return res.status(400).json({ mensagem: 'Informe seus dados de acesso.' });
     }
 
     try {
+        etapa = 'buscar usuário';
         const resultado = tipo === 'visitante'
             ? await db.query(
                 'SELECT nome, email, senha FROM usuario WHERE cpf = $1',
@@ -189,6 +191,7 @@ async function entrar(req, res) {
             );
 
         const usuario = resultado.rows[0];
+        etapa = 'verificar senha';
         const senhaValida = usuario
             ? await verificarSenha(senha, usuario.senha)
             : await verificarSenha(senha, HASH_SENHA_INEXISTENTE);
@@ -198,6 +201,7 @@ async function entrar(req, res) {
         }
 
         if (!senhaEstaHasheada(usuario.senha)) {
+            etapa = 'atualizar hash da senha';
             const senhaHash = await gerarHash(senha);
             const coluna = tipo === 'visitante' ? 'cpf' : 'matricula';
             await db.query(
@@ -206,6 +210,7 @@ async function entrar(req, res) {
             );
         }
 
+        etapa = 'criar sessão';
         const token = await criarToken(tipo, identificador);
 
         return res.json({
@@ -218,7 +223,11 @@ async function entrar(req, res) {
             }
         });
     } catch (erro) {
-        console.error('Erro ao autenticar usuário:', erro.message);
+        console.error('Erro ao autenticar usuário:', {
+            etapa,
+            codigo: erro.code || 'SEM_CODIGO',
+            mensagem: erro.message
+        });
         return res.status(500).json({ mensagem: 'Não foi possível realizar o login.' });
     }
 }
