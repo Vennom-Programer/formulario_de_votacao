@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 const scores = Array.from({ length: 11 }, (_, index) => index)
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [criteria, setCriteria] = useState([])
@@ -21,7 +22,7 @@ function App() {
 
     async function loadCriteria() {
       try {
-        const response = await fetch('/api/avaliacoes/criterios')
+        const response = await fetch(`${API_URL}/api/avaliacoes/criterios`)
         const result = await response.json()
 
         if (!response.ok) {
@@ -62,7 +63,7 @@ function App() {
 
     async function loadProjects() {
       try {
-        const response = await fetch('/api/projetos')
+        const response = await fetch(`${API_URL}/api/projetos`)
         const result = await response.json()
 
         if (!response.ok) {
@@ -120,8 +121,7 @@ function App() {
     setStatus({ type: '', message: '' })
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '/api/avaliacoes'
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${API_URL}/api/avaliacoes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
