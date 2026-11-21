@@ -6,7 +6,9 @@ function obterSegredo() {
     const segredo = process.env.AUTH_SECRET;
 
     if (!segredo || Buffer.byteLength(segredo) < 32) {
-        throw new Error('AUTH_SECRET precisa ter pelo menos 32 bytes.');
+        const erro = new Error('AUTH_SECRET ausente ou menor que 32 bytes.');
+        erro.code = 'AUTH_SECRET_CONFIG';
+        throw erro;
     }
 
     return segredo;

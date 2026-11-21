@@ -224,6 +224,9 @@ async function entrar(req, res) {
         });
     } catch (erro) {
         const codigo = erro.code || 'SEM_CODIGO';
+        const mensagem = codigo === 'AUTH_SECRET_CONFIG'
+            ? 'Configuração de autenticação inválida no servidor.'
+            : 'Não foi possível realizar o login.';
 
         console.error('Erro ao autenticar usuário:', {
             etapa,
@@ -231,7 +234,7 @@ async function entrar(req, res) {
             mensagem: erro.message
         });
         return res.status(500).json({
-            mensagem: 'Não foi possível realizar o login.',
+            mensagem,
             etapa,
             codigo
         });
