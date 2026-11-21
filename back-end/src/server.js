@@ -5,11 +5,13 @@ const db = require('./config/database');
 const statusRoutes = require('./routes/StatusRoutes');
 const avaliacaoRoutes = require('./routes/avaliacaoRoutes');
 const projetoRoutes = require('./routes/ProjetoRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/auth', authRoutes);
 
 // Rota de teste
 app.get('/', async (req, res) => {

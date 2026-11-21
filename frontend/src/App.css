@@ -573,6 +573,194 @@
 	font-size: 9px;
 }
 
+.auth-shell {
+	--ink: #0D1117;
+	--accent-gradient: linear-gradient(135deg, #06B6D4 0%, #2563EB 100%);
+	width: min(1200px, calc(100% - 64px));
+	min-height: 100vh;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	animation: arrive 600ms ease-out both;
+}
+
+.auth-workspace {
+	flex: 1;
+	display: grid;
+	grid-template-columns: minmax(270px, 0.78fr) minmax(0, 1.5fr);
+	align-items: start;
+	gap: 58px;
+	padding: 48px 0 50px;
+}
+
+.auth-intro {
+	position: relative;
+	min-height: 520px;
+	overflow: hidden;
+	padding: 28px 8px 0 0;
+}
+
+.auth-intro h1 {
+	max-width: 380px;
+	margin: 30px 0 18px;
+	color: var(--ink);
+	font-family: 'Fraunces', Georgia, serif;
+	font-size: clamp(42px, 4.4vw, 58px);
+	font-weight: 500;
+	line-height: 1.04;
+}
+
+.auth-intro h1 em {
+	background: var(--accent-gradient);
+	background-clip: text;
+	color: transparent;
+	font-weight: 500;
+}
+
+.auth-note {
+	position: relative;
+	z-index: 1;
+	max-width: 310px;
+	margin-top: 31px;
+}
+
+.auth-panel {
+	width: 100%;
+	max-width: none;
+	padding: 30px 34px 26px;
+	border: 1px solid #e6e9e4;
+	border-radius: 8px;
+	background: #F8FAFC;
+	box-shadow: 0 12px 35px #344c3510;
+}
+
+.auth-types {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin: 21px 0 18px;
+	padding: 0;
+	border: 0;
+}
+
+.auth-types legend {
+	margin-bottom: 9px;
+	color: #0D1117;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.auth-type {
+	display: flex;
+	min-height: 42px;
+	align-items: center;
+	gap: 9px;
+	padding: 0 12px;
+	border: 1px solid #e6e9e4;
+	border-radius: 4px;
+	background: #F8FAFC;
+	color: #0D1117;
+	cursor: pointer;
+	font-size: 12px;
+	transition: border-color 150ms ease, background 150ms ease;
+}
+
+.auth-type.selected {
+	border-color: transparent;
+	background:
+		linear-gradient(#F8FAFC, #F8FAFC) padding-box,
+		var(--accent-gradient) border-box;
+	box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.12);
+}
+
+.auth-type input {
+	margin: 0;
+	accent-color: #2563EB;
+}
+
+.auth-fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 15px;
+}
+
+.auth-fields .field:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+}
+
+.auth-feedback {
+	margin-top: 16px;
+	padding: 11px 12px;
+	border: 1px solid #e6e9e4;
+	border-radius: 4px;
+	color: #0D1117;
+	background: #F8FAFC;
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.auth-feedback.success {
+	border-color: #06B6D4;
+}
+
+.auth-submit {
+	width: 100%;
+	margin-top: 20px;
+}
+
+.auth-switch {
+	margin: 19px 0 0;
+	color: #0D1117;
+	font-size: 11px;
+	text-align: center;
+}
+
+.auth-switch button {
+	padding: 0;
+	border: 0;
+	background: none;
+	background: var(--accent-gradient);
+	background-clip: text;
+	color: transparent;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 700;
+}
+
+.auth-switch button:hover {
+	text-decoration: underline;
+}
+
+.logout-button {
+	padding: 8px 12px;
+	border: 1px solid #dfe4de;
+	border-radius: 4px;
+	background: #F8FAFC;
+	color: #0D1117;
+	cursor: pointer;
+	font-size: 11px;
+}
+
+.logout-button:hover {
+	border-color: #06B6D4;
+}
+
+.auth-loading {
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+}
+
+.auth-loading .live-dot {
+	width: 10px;
+	height: 10px;
+}
+
+.auth-loading p {
+	color: #0D1117;
+	font-size: 12px;
+}
+
 .page-footer > span:first-child {
 	font-weight: 700;
 	letter-spacing: 0.6px;
@@ -593,6 +781,31 @@
 @media (max-width: 1000px) {
 	.app-shell {
 		width: min(760px, calc(100% - 40px));
+	}
+
+	.auth-shell {
+		width: min(760px, calc(100% - 40px));
+	}
+
+	.auth-workspace {
+		grid-template-columns: 1fr;
+		gap: 26px;
+		padding: 30px 0 50px;
+	}
+
+	.auth-intro {
+		min-height: 0;
+		padding: 10px 0 0;
+	}
+
+	.auth-intro h1 {
+		max-width: 570px;
+		margin: 19px 0 10px;
+		font-size: 47px;
+	}
+
+	.auth-panel {
+		max-width: none;
 	}
 
 	.workspace {
@@ -631,8 +844,47 @@
 		width: calc(100% - 32px);
 	}
 
+	.auth-shell {
+		width: calc(100% - 32px);
+	}
+
 	.topbar {
 		height: 66px;
+	}
+
+	.auth-workspace {
+		gap: 20px;
+		padding: 24px 0 28px;
+	}
+
+	.auth-intro h1 {
+		max-width: 390px;
+		margin: 17px 0 10px;
+		font-size: 40px;
+	}
+
+	.auth-intro .intro-copy {
+		font-size: 12px;
+	}
+
+	.auth-panel {
+		padding: 22px 16px 18px;
+	}
+
+	.auth-panel .form-heading h2 {
+		font-size: 18px;
+	}
+
+	.auth-panel .required-note {
+		font-size: 9px;
+	}
+
+	.auth-fields {
+		grid-template-columns: 1fr;
+	}
+
+	.auth-fields .field:last-child:nth-child(odd) {
+		grid-column: auto;
 	}
 
 	.event-label {
