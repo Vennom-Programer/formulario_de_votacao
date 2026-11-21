@@ -59,7 +59,16 @@ function AuthScreen({ onAuthenticated, initialMessage }) {
         setStatus({ type: 'success', message: result.mensagem })
       } else {
         if (typeof result.token !== 'string' || !result.token) {
-          throw new Error('O servidor não retornou uma sessão válida.')
+          const camposRecebidos = result && typeof result === 'object'
+            ? Object.keys(result).join(', ')
+            : ''
+          const endpoint = `${API_URL || window.location.origin}/api/auth/login`
+
+          throw new Error(
+            `A API de login (${endpoint}) respondeu sem o campo "token". ` +
+            `Campos recebidos: ${camposRecebidos || 'nenhum'}. ` +
+            'Verifique se VITE_API_URL aponta para o backend atualizado.'
+          )
         }
         onAuthenticated(result.token)
       }
