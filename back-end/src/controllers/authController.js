@@ -223,12 +223,18 @@ async function entrar(req, res) {
             }
         });
     } catch (erro) {
+        const codigo = erro.code || 'SEM_CODIGO';
+
         console.error('Erro ao autenticar usuário:', {
             etapa,
-            codigo: erro.code || 'SEM_CODIGO',
+            codigo,
             mensagem: erro.message
         });
-        return res.status(500).json({ mensagem: 'Não foi possível realizar o login.' });
+        return res.status(500).json({
+            mensagem: 'Não foi possível realizar o login.',
+            etapa,
+            codigo
+        });
     }
 }
 

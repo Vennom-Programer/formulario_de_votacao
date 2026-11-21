@@ -49,7 +49,12 @@ function AuthScreen({ onAuthenticated, initialMessage }) {
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.mensagem || 'Não foi possível concluir a operação.')
+        const diagnostico = response.status >= 500 && result.etapa
+          ? ` (etapa: ${result.etapa}${result.codigo ? `; código: ${result.codigo}` : ''})`
+          : ''
+        throw new Error(
+          `${result.mensagem || 'Não foi possível concluir a operação.'}${diagnostico}`
+        )
       }
 
       if (isRegistering) {
