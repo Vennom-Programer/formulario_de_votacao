@@ -169,7 +169,10 @@ async function criarAvaliacao(req, res) {
             });
         }
 
-        console.error('Erro ao registrar avaliação:', erro.message);
+        console.error('Erro ao registrar avaliação:', {
+            codigo: erro.code || 'SEM_CODIGO',
+            mensagem: erro.message
+        });
 
         return res.status(500).json({
             mensagem: 'Não foi possível registrar a avaliação.'
