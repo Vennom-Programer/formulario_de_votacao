@@ -160,7 +160,7 @@ async function cadastrar(req, res) {
 
             await client.query(
                 `INSERT INTO avaliadores (id_avaliador, codigo, ativo)
-                 VALUES ($1::text, $2::varchar, TRUE)
+                 VALUES ($1::integer, $2::varchar, TRUE)
                  ON CONFLICT (id_avaliador)
                  DO UPDATE SET codigo = EXCLUDED.codigo, ativo = TRUE`,
                 [identificador, identificador]
@@ -234,10 +234,10 @@ async function entrar(req, res) {
         etapa = 'vincular avaliador';
         await db.query(
             `INSERT INTO avaliadores (id_avaliador, codigo, ativo)
-             VALUES ($1::text, $2::varchar, TRUE)
+             VALUES ($1::integer, $2::varchar, TRUE)
              ON CONFLICT (id_avaliador)
              DO UPDATE SET codigo = EXCLUDED.codigo, ativo = TRUE`,
-            [identificador, identificador]
+            [Number(identificador), identificador]
         );
 
         etapa = 'criar sessão';

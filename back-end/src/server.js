@@ -31,6 +31,8 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Rotas de autenticação
+app.use('/api/auth', authRoutes);
 // Rotas de avaliação
 app.use('/api/avaliacoes', avaliacaoRoutes);
 // Rotas de status
