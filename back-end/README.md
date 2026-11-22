@@ -23,4 +23,10 @@ Rotas:
 Senhas novas são armazenadas com scrypt e salt aleatório. Senhas legadas em texto
 plano são convertidas para hash no primeiro login bem-sucedido. Após o login, o
 frontend guarda o token na sessão atual e libera a página de votação. A rota de
-envio da avaliação exige o token de autenticação.
+envio da avaliação exige o token de autenticação e usa o CPF do visitante ou a
+matrícula do aluno da sessão diretamente como `id_avaliador`; não é necessário
+enviar um código separado. Ao cadastrar a conta, o backend também cria ou ativa
+o registro correspondente em `avaliadores`; contas existentes são vinculadas no
+próximo login. A coluna `id_avaliador` e as
+referências correspondentes em `avaliacoes` devem aceitar o CPF ou a matrícula
+como identificador. O valor permanece sem formatação.

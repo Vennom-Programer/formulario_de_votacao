@@ -35,12 +35,18 @@ async function listarCriterios(req, res) {
 }
 
 async function criarAvaliacao(req, res) {
-    const { codigo, id_projeto, notas } = req.body;
+    const { id_projeto, notas } = req.body;
+    const idAvaliador = req.usuario?.identificador;
 
     // 1. Validar os dados recebidos
-    if (!codigo || !Number.isInteger(id_projeto) || id_projeto <= 0) {
+    if (
+        typeof idAvaliador !== 'string' ||
+        !idAvaliador.trim() ||
+        !Number.isInteger(id_projeto) ||
+        id_projeto <= 0
+    ) {
         return res.status(400).json({
-            mensagem: 'Código e projeto são obrigatórios.'
+            mensagem: 'Sessão válida e projeto são obrigatórios.'
         });
     }
 
@@ -76,19 +82,19 @@ async function criarAvaliacao(req, res) {
     try {
         await client.query('BEGIN');
 
-        // 3. Buscar o avaliador pelo código
+        // 3. Confirmar que o avaliador da sessão está ativo
         const avaliador = await client.query(
             `SELECT id_avaliador
              FROM avaliadores
-             WHERE codigo = $1 AND ativo = TRUE`,
-            [codigo.trim()]
+             WHERE id_avaliador = $1 AND ativo = TRUE`,
+            [idAvaliador.trim()]
         );
 
         if (avaliador.rows.length === 0) {
             await client.query('ROLLBACK');
 
             return res.status(403).json({
-                mensagem: 'Código inválido ou inativo.'
+                mensagem: 'Avaliador inválido ou inativo.'
             });
         }
 

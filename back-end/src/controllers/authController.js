@@ -139,26 +139,47 @@ async function cadastrar(req, res) {
 
     try {
         const senhaHash = await gerarHash(senha);
-        const resultado = tipo === 'visitante'
-            ? await db.query(
-                `INSERT INTO usuario (nome, email, senha, cpf, matricula)
-                 VALUES ($1, $2, $3, $4, NULL)
-                 RETURNING nome, email`,
-                [nomeNormalizado, emailNormalizado, senhaHash, identificador]
-            )
-            : await db.query(
-                `INSERT INTO usuario (nome, email, senha, cpf, matricula)
-                 VALUES ($1, $2, $3, NULL, $4)
-                 RETURNING nome, email`,
-                [nomeNormalizado, emailNormalizado, senhaHash, Number(identificador)]
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            const resultado = tipo === 'visitante'
+                ? await client.query(
+                    `INSERT INTO usuario (nome, email, senha, cpf, matricula)
+                     VALUES ($1, $2, $3, $4, NULL)
+                     RETURNING nome, email`,
+                    [nomeNormalizado, emailNormalizado, senhaHash, identificador]
+                )
+                : await client.query(
+                    `INSERT INTO usuario (nome, email, senha, cpf, matricula)
+                     VALUES ($1, $2, $3, NULL, $4)
+                     RETURNING nome, email`,
+                    [nomeNormalizado, emailNormalizado, senhaHash, Number(identificador)]
+                );
+
+            await client.query(
+                `INSERT INTO avaliadores (id_avaliador, codigo, ativo)
+                 VALUES ($1, $1, TRUE)
+                 ON CONFLICT (id_avaliador)
+                 DO UPDATE SET codigo = EXCLUDED.codigo, ativo = TRUE`,
+                [identificador]
             );
 
-        return res.status(201).json({
-            mensagem: 'Cadastro realizado. Entre com seus dados para continuar.',
-            usuario: resultado.rows[0]
-        });
+            await client.query('COMMIT');
+
+            return res.status(201).json({
+                mensagem: 'Cadastro realizado. Entre com seus dados para continuar.',
+                usuario: resultado.rows[0]
+            });
+        } catch (erro) {
+            await client.query('ROLLBACK');
+            throw erro;
+        } finally {
+            client.release();
+        }
     } catch (erro) {
-        if (erro.code === '23505') {
+        if (erro.code === '23505' && erro.constraint?.startsWith('usuario_')) {
             return res.status(409).json({ mensagem: tipoDeConflito(erro) });
         }
 
@@ -209,6 +230,15 @@ async function entrar(req, res) {
                 [senhaHash, tipo === 'visitante' ? identificador : Number(identificador)]
             );
         }
+
+        etapa = 'vincular avaliador';
+        await db.query(
+            `INSERT INTO avaliadores (id_avaliador, codigo, ativo)
+             VALUES ($1, $1, TRUE)
+             ON CONFLICT (id_avaliador)
+             DO UPDATE SET codigo = EXCLUDED.codigo, ativo = TRUE`,
+            [identificador]
+        );
 
         etapa = 'criar sessão';
         const token = await criarToken(tipo, identificador);

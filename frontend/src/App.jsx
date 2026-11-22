@@ -259,7 +259,6 @@ function AuthScreen({ onAuthenticated, initialMessage }) {
 function VotingPage({ token, onLogout }) {
   const [criteria, setCriteria] = useState([])
   const [projects, setProjects] = useState([])
-  const [code, setCode] = useState('')
   const [projectId, setProjectId] = useState('')
   const [ratings, setRatings] = useState({})
   const [status, setStatus] = useState({ type: '', message: '' })
@@ -380,7 +379,6 @@ function VotingPage({ token, onLogout }) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          codigo: code.trim(),
           id_projeto: Number(projectId),
           notas: criteria.map((criterion) => ({
             id_criterio: criterion.id_criterio,
@@ -398,7 +396,6 @@ function VotingPage({ token, onLogout }) {
         type: 'success',
         message: result.mensagem || 'Seu voto foi registrado com sucesso.',
       })
-      setCode('')
       setProjectId('')
       setRatings({})
     } catch (error) {
@@ -472,17 +469,6 @@ function VotingPage({ token, onLogout }) {
 
           <form onSubmit={handleSubmit}>
             <div className="identity-fields">
-              <label className="field">
-                <span>Código de votação <span className="required-star">*</span></span>
-                <input
-                  autoComplete="off"
-                  name="codigo"
-                  onChange={(event) => setCode(event.target.value)}
-                  placeholder="Digite seu código"
-                  required
-                  value={code}
-                />
-              </label>
               <label className="field field-project">
                 <span>Projeto <span className="required-star">*</span></span>
                 <select
@@ -502,6 +488,9 @@ function VotingPage({ token, onLogout }) {
                   ))}
                 </select>
               </label>
+              <p className="voting-identity-note">
+                Seu CPF ou matrícula será usado automaticamente como identificação do avaliador.
+              </p>
             </div>
 
             <div className="criteria-heading">
