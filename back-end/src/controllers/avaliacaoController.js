@@ -86,7 +86,7 @@ async function criarAvaliacao(req, res) {
         const avaliador = await client.query(
             `SELECT id_avaliador
              FROM avaliadores
-             WHERE id_avaliador = $1 AND ativo = TRUE`,
+             WHERE id_avaliador = $1::text AND ativo = TRUE`,
             [idAvaliador.trim()]
         );
 
@@ -135,7 +135,7 @@ async function criarAvaliacao(req, res) {
         // 6. Criar a avaliação
         const novaAvaliacao = await client.query(
             `INSERT INTO avaliacoes (id_avaliador, id_projeto)
-             VALUES ($1, $2)
+             VALUES ($1::text, $2::integer)
              RETURNING id_avaliacao`,
             [avaliador.rows[0].id_avaliador, id_projeto]
         );
